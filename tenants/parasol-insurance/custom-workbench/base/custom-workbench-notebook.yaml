@@ -54,19 +54,18 @@ spec:
                 --ServerApp.password=''
                 --ServerApp.base_url=/notebook/parasol-insurance/custom-workbench
                 --ServerApp.quit_button=False
-                --ServerApp.disable_check_xsrf=True
                 --ServerApp.tornado_settings={"user":"user1","hub_host":"","hub_prefix":"/projects/parasol-insurance"}
             - name: JUPYTER_IMAGE
               value: 'image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/custom-notebook:latest'
+            - name: PIPELINES_SSL_SA_CERTS
+              value: /etc/pki/tls/custom-certs/ca-bundle.crt
+            - name: GIT_SSL_CAINFO
+              value: /etc/pki/tls/custom-certs/ca-bundle.crt
             - name: PIP_CERT
               value: /etc/pki/tls/custom-certs/ca-bundle.crt
             - name: REQUESTS_CA_BUNDLE
               value: /etc/pki/tls/custom-certs/ca-bundle.crt
             - name: SSL_CERT_FILE
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: PIPELINES_SSL_SA_CERTS
-              value: /etc/pki/tls/custom-certs/ca-bundle.crt
-            - name: GIT_SSL_CAINFO
               value: /etc/pki/tls/custom-certs/ca-bundle.crt
           ports:
             - containerPort: 8888
@@ -83,6 +82,9 @@ spec:
               readOnly: true
               subPath: ca-bundle.crt
           workingDir: /opt/app-root/src
+          envFrom:
+            - secretRef:
+                name: minio-data-connection
       enableServiceLinks: false
       serviceAccountName: custom-workbench
       volumes:
